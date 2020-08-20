@@ -26,6 +26,18 @@ if os.path.isdir('results'):
         exit(print("Be sure to change the name of the results folder to keep the content"))
 os.makedirs('results')
 
+# init agents
+device = torch.device('cuda:0') if agents.cuda else torch.device('cpu')
+if image_size[1:] == (64, 64):
+    generator = agents.Generator64x64().to(device)
+    discriminator = agents.Discriminator64x64().to(device)
+elif image_size[1:] == (128, 128):
+    generator = agents.Generator128x128().to(device)
+    discriminator = agents.Discriminator128x128().to(device)
+else:
+    print("Only image sizes of 64x64 and 128x128 are supported")
+    exit()
+
 # load dataset
 dataset = dset.ImageFolder(root=data_path,
                            transform=transforms.Compose([
@@ -36,27 +48,6 @@ dataset = dset.ImageFolder(root=data_path,
                            ]))
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True)
-device = torch.device('cuda:0')
-
-# init agents
-if image_size[1:] == (4, 4):
-    generator = agents.Generator4x4().to(device)
-    discriminator = agents.Discriminator4x4().to(device)
-elif image_size[1:] == (8, 8):
-    generator = agents.Generator8x8().to(device)
-    discriminator = agents.Discriminator8x8().to(device)
-elif image_size[1:] == (16, 16):
-    generator = agents.Generator16x16().to(device)
-    discriminator = agents.Discriminator16x16().to(device)
-elif image_size[1:] == (32, 32):
-    generator = agents.Generator32x32().to(device)
-    discriminator = agents.Discriminator32x32().to(device)
-elif image_size[1:] == (64, 64):
-    generator = agents.Generator64x64().to(device)
-    discriminator = agents.Discriminator64x64().to(device)
-elif image_size[1:] == (128, 128):
-    generator = agents.Generator128x128().to(device)
-    discriminator = agents.Discriminator128x128().to(device)
 
 if load_models:
     generator.load_state_dict(load(path_g))
